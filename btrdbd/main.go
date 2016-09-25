@@ -9,7 +9,7 @@ import (
 	"runtime/pprof"
 	"strconv"
 	"time"
-	
+
 	"github.com/SoftwareDefinedBuildings/btrdb"
 	"github.com/SoftwareDefinedBuildings/btrdb/cpinterface"
 	"github.com/SoftwareDefinedBuildings/btrdb/httpinterface"
@@ -26,15 +26,25 @@ func init() {
 }
 
 var createDB = flag.Bool("makedb", false, "create a new database")
+var printVersion = flag.Bool("version", false, "print version and exit")
 
 func main() {
-	loadConfig()
 	flag.Parse()
+	if *printVersion {
+		if btrdb.VersionString == "" {
+			fmt.Println("3.x.x")
+		} else {
+			fmt.Println(btrdb.VersionString)
+		}
+		os.Exit(0)
+	}
+	log.Infof("Starting BTrDB version %s %s", btrdb.VersionString, btrdb.BuildDate)
+	loadConfig()
 
 	go func() {
 		for {
-			time.Sleep(10 * time.Second)
-			fmt.Println("Num goroutines: ", runtime.NumGoroutine())
+			time.Sleep(1 * time.Second)
+			log.Infof("Num goroutines: %d", runtime.NumGoroutine())
 		}
 	}()
 	if Configuration.Debug.Cpuprofile {
